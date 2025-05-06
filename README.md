@@ -1,32 +1,44 @@
-# GitOps-style Continuous Delivery For Kubernetes Engine With Cloud Build
+# Deployment Configurations for GitOps Pipeline
 
-This repository contains the code used in the
-[GitOps-style Continuous Delivery with Cloud Build](https://cloud.google.com/kubernetes-engine/docs/tutorials/gitops-cloud-build)
-tutorial.
+This repository contains the deployment manifests and Kubernetes configurations used in the **GitOps-style Continuous Delivery pipeline**. The configurations here are version-controlled and define the deployment process for the application running on **Google Kubernetes Engine (GKE)**.
 
-GitOps is a Continuous Delivery approach [first described by Weaveworks](https://www.weave.works/blog/gitops-operations-by-pull-request) that is
-popular in the Kubernetes community. A key part of GitOps is the idea of
-"environments-as-code": describing your deployments declaratively by files (for
-example, Kubernetes manifests) stored in a Git repository.
+## Overview
 
-In this tutorial, you create a CI/CD pipeline that automatically builds a
-container image from commited code, stores the image in Google Artifact
-Registry, updates a Kubernetes manifest in a Git repository and triggers a
-deployment to Kubernetes Engine using that manifest.
+The _env_ repository stores Kubernetes manifests that describe the deployment of the application to different environments. This repository plays a crucial role in the **GitOps pipeline**, where changes to deployment configurations are automatically updated and deployed via Cloud Build when a new image is pushed to **Google Artifact Registry**.
 
-This tutorial uses two Git repositories: one for the application —the _app_
-repository— and one for storing the deployment manifests —the _env_ repository.
-When a change is pushed to the application repository, tests are run, a
-container image is built and pushed to Artifact Registry. Once the image is
-pushed, the deployment manifests are updated to use that new image and they are
-pushed to the _candidate_ branch of the _env_ repository. This triggers the actual
-deployment in Kubernetes. Once the deployment is finished, the new manifests
-are copied over to the _production_ branch of the _env_ repository.
+### Repository Structure
 
-In the end, you have a system where:
-* The _candidate_ branch is a history of the deployment attempts.
-* The _production_ branch is a history of the successful deployments.
-* You have a view of successful and failed deployments in Cloud Build.
-* You can rollback to any previous deployment by re-executing the corresponding
-  job in Cloud Build. A rollback also updates the _production_ branch to
-  truthfully reflect the history of deployments.
+This repository includes two primary branches:
+
+- **_candidate_ branch**: Stores the deployment manifests for all attempts, both successful and failed. This serves as the staging area for testing new deployments before they go into production.
+- **_production_ branch**: Holds the deployment manifests for the successfully deployed versions. This branch reflects the actual state of production and is always in sync with the latest successful deployment.
+
+### How It Works
+
+1. **Manifest Updates**: After a new container image is pushed to Artifact Registry by the CI pipeline in the _app_ repository, Cloud Build automatically updates the deployment manifests stored in this repository to point to the new image.
+   
+2. **Deployment Process**: The updated manifests are pushed to the **_candidate_ branch**, triggering a deployment to **Google Kubernetes Engine (GKE)**. If the deployment is successful, the manifests are then moved to the **_production_ branch**, marking it as the latest stable version.
+
+3. **Rollback**: In case of any issues, deployments can be rolled back by re-executing previous Cloud Build jobs. The rollback process automatically updates the _production_ branch with the corresponding manifest from the previous successful deployment.
+
+### Branch Management
+
+- **_candidate_ branch**:
+    - Used for tracking all deployment attempts.
+    - Contains both successful and failed deployment configurations.
+    - Allows for easy troubleshooting and testing of new deployments before they go live.
+
+- **_production_ branch**:
+    - Only contains deployment configurations that have been successfully deployed to production.
+    - Represents the state of the live application on **GKE**.
+
+### Benefits of Using This Repository
+
+- **Auditability**: All deployment changes are tracked and stored in Git, making it easy to trace back any issues or changes.
+- **Automated Deployments**: Changes pushed to the _candidate_ branch automatically trigger deployments, and only successful deployments make it to the _production_ branch.
+- **Rollback Capability**: The versioned deployment configurations in Git allow for easy rollback to any previous successful deployment by re-executing the corresponding Cloud Build job.
+
+## Conclusion
+
+This repository serves as the source of truth for deployment configurations and is tightly integrated with the **GitOps pipeline**. By using Git to manage Kubernetes manifests, I ensure that deployments are automated, auditable, and easily reversible.
+
