@@ -41,4 +41,7 @@ This repository includes two primary branches:
 ## Conclusion
 
 This repository serves as the source of truth for deployment configurations and is tightly integrated with the **GitOps pipeline**. By using Git to manage Kubernetes manifests, I ensure that deployments are automated, auditable, and easily reversible.
+## References
+
+- [Google Kubernetes Engine Pipeline using Cloud Build](https://www.cloudskillsboost.google/focuses/52829?parent=catalog)
 
