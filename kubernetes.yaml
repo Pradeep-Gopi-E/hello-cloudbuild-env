@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: hello-cloudbuild
-        image: europe-west4-docker.pkg.dev/qwiklabs-gcp-02-765e3d8ead34/my-repository/hello-cloudbuild:de42e90
+        image: europe-west4-docker.pkg.dev/qwiklabs-gcp-02-765e3d8ead34/my-repository/hello-cloudbuild:98a270c
         ports:
         - containerPort: 8080
 ---
